@@ -1,0 +1,49 @@
+---
+import type { CollectionEntry } from 'astro:content'
+import BaseHead from '../components/BaseHead.astro'
+import Header from '../components/Header.astro'
+import Footer from '../components/Footer.astro'
+import { Image } from 'astro:assets'
+import Page from './Page.astro'
+
+type Props = CollectionEntry<'posts'>['data']
+
+const { title, description, createdAt, image } = Astro.props
+---
+
+<html lang="en">
+	<head>
+		<BaseHead title={title} description={description} />
+	</head>
+	<Page>
+		<Header />
+		<main class="mx-auto mt-2 w-3/4">
+			<article class="space-y-2">
+				<div>
+					<p class="text-4xl font-semibold">{title}</p>
+					<p>{description}</p>
+				</div>
+				<Image
+					src={image}
+					class="aspect-video w-full drop-shadow-md"
+					alt={title}
+					width={400}
+					height={400}
+				/>
+				<p>
+					<strong>Created:</strong>
+					{
+						createdAt.toLocaleDateString('en-us', {
+							year: 'numeric',
+							month: 'short',
+							day: 'numeric'
+						})
+					}
+				</p>
+
+				<slot />
+			</article>
+		</main>
+		<Footer />
+	</Page>
+</html>

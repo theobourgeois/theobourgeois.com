@@ -1,0 +1,35 @@
+@font-face {
+	font-family: 'Atkinson';
+	src: url('/fonts/atkinson-regular.woff') format('woff');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Atkinson';
+	src: url('/fonts/atkinson-bold.woff') format('woff');
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
+}
+
+body {
+	font-family: 'Atkinson', sans-serif;
+	margin: 0;
+	padding: 0;
+}
+
+h1 {
+	font-size: xx-large;
+	font-weight: bold;
+}
+h2 {
+	font-size: x-large;
+	font-weight: bold;
+}
+
+h3 {
+	font-size: large;
+	font-weight: bold;
+}
