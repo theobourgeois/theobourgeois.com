@@ -10,7 +10,6 @@ import Page from '../layouts/Page.astro'
 const posts = (await getCollection('posts')).sort(
 	(a, b) => b.data.createdAt.valueOf() - a.data.createdAt.valueOf()
 )
-console.log(posts)
 ---
 
 <!doctype html>
@@ -31,7 +30,7 @@ console.log(posts)
 					<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
 						{
 							posts.map((post) => (
-								<a class="space-y-2" href={`/posts/${post.slug}`}>
+								<a class="space-y-2 text-black" href={`/posts/${post.slug}`}>
 									<Image
 										class="aspect-video w-full rounded-sm shadow-md transition-transform duration-300 ease-in-out hover:scale-105"
 										width={200}

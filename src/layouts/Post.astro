@@ -23,13 +23,6 @@ const { title, description, createdAt, image } = Astro.props
 					<p class="text-4xl font-semibold">{title}</p>
 					<p>{description}</p>
 				</div>
-				<Image
-					src={image}
-					class="aspect-video w-full drop-shadow-md"
-					alt={title}
-					width={400}
-					height={400}
-				/>
 				<p>
 					<strong>Created:</strong>
 					{
@@ -40,8 +33,15 @@ const { title, description, createdAt, image } = Astro.props
 						})
 					}
 				</p>
+				<Image
+					src={image}
+					class="aspect-video w-full drop-shadow-md mb-8"
+					alt={title}
+					width={400}
+					height={400}
+				/>
 
-				<slot />
+					<slot />
 			</article>
 		</main>
 		<Footer />
