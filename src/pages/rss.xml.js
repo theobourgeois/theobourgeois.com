@@ -12,7 +12,7 @@ export async function GET(context) {
 				description: 'Description for Item 1',
 				pubDate: new Date(),
 				link: 'https://example.com/item1'
-		},	
+			}
 		]
 	})
 }

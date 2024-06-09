@@ -15,13 +15,13 @@ The vertical axis represents the decibals (db). Decibals represent the loudness 
 
 In this specific EQ configuration, I'm cutting the low end frequencies (0-200hz). This will lead to more a more tinney and less full sound. Hear the different below. 
 
-!["FabFilter Pro-Q3"](/public/proq.png)
+!["FabFilter Pro-Q3"](/proq.png)
 
 With EQ
 <figure style="margin:0">
   <audio
       controls
-      src="/public/eqed.mp3">
+      src="/eqed.mp3">
           Your browser does not support the audio element.
   </audio>
 </figure>
@@ -30,7 +30,7 @@ Without EQ
 <figure style="margin:0">
   <audio
       controls
-      src="/public/noqed.mp3">
+      src="/noqed.mp3">
           Your browser does not support the audio element.
   </audio>
 </figure>

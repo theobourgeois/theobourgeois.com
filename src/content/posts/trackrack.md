@@ -15,7 +15,7 @@ To enhance this improvement aspect, invited users can provide their feedback thr
 
 Overall, TrackRack gives musicians a more ergonomic way to create music. It allows them to streamline their work and improve it.
 
-![TrackRack track page](/public/trackrack-2.png)
+![TrackRack track page](/trackrack-2.png)
 *The 'Track' page. Notice how files are separated by type*
 
 ## How I created TrackRack
