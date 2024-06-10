@@ -8,7 +8,7 @@ import { Image } from 'astro:assets'
 import Page from '../layouts/Page.astro'
 
 const posts = (await getCollection('posts')).sort(
-	(a, b) => b.data.createdAt.valueOf() - a.data.createdAt.valueOf()
+	(a, b) => a.data.priority - b.data.priority
 )
 ---
 
@@ -20,8 +20,8 @@ const posts = (await getCollection('posts')).sort(
 	<Page>
 		<Header />
 		<main class="mx-auto mt-2 w-3/4">
-			<p class="mb-4 text-xl">
-				Hi, I'm <strong>Théo Bourgeois</strong>, a software engineer and web developer.
+			<p class="mb-4 text-lg">
+				Hi, I'm <strong>Théo Bourgeois</strong>, a software engineer and web developer. This website is used to show my projects and other things I'm working on.
 			</p>
 
 			<div class="space-y-4">
@@ -43,11 +43,6 @@ const posts = (await getCollection('posts')).sort(
 											<h4 class="cursor-pointer text-xl font-semibold text-zinc-800 hover:underline">
 												{post.data.title}
 											</h4>{' '}
-											-
-											{post.data.createdAt.toLocaleDateString('en-us', {
-												year: 'numeric',
-												month: 'long'
-											})}
 										</div>
 
 										<p class="text-sm">{post.data.description}</p>

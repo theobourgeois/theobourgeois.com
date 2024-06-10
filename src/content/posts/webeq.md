@@ -3,6 +3,7 @@ title: 'WebEQ'
 description: 'Multi-band audio equalizer for the web made in React'
 createdAt: 'Sep 07 2023'
 image: '/webeq.png'
+priority: 6
 ---
 
 ## What is EQ?
