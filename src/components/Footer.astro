@@ -4,7 +4,8 @@ import Socials from './Socials.astro'
 const today = new Date()
 ---
 
-<footer>
+<footer class="flex flex-col">
+  <a href="/beats" class="underline">View my beats</a>
 	&copy; {today.getFullYear()} Théo Bourgeois. All rights reserved.
 	<div class="flex justify-center mt-2">
 		<Socials />

@@ -1,6 +1,6 @@
 ---
 title: 'ReelData'
-description: 'Piano roll application to create and play music.'
+description: 'My first software developement job.'
 createdAt: 'Jul 08 2022'
 image: '/reeldata.svg'
 priority: 1

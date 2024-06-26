@@ -32,7 +32,7 @@ const posts = (await getCollection('posts')).sort(
 							posts.map((post) => (
 								<a class="space-y-2 text-black" href={`/posts/${post.slug}`}>
 									<Image
-										class="aspect-video w-full rounded-sm shadow-md transition-transform duration-300 ease-in-out hover:scale-105"
+										class="aspect-video w-full bg-zinc-800 rounded-sm shadow-md transition-transform duration-300 ease-in-out hover:scale-105"
 										width={200}
 										height={200}
 										src={post.data.image}

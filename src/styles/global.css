@@ -14,6 +14,21 @@
 	font-display: swap;
 }
 
+ul {
+	list-style-type: disc;
+	list-style-position: inside; /* Moves the bullet inside the content */
+	padding-left: 20px; /* Adjust to align the bullets neatly */
+	margin-left: 0; /* Remove extra margin */
+}
+
+ol {
+
+	list-style-type: decimal;
+	padding-left: 0;   /* Ensure no additional padding on list items */
+	margin-left: 0;    /* Ensure no additional margin on list items */
+	line-height: 1.5;  /* Adjust line height for better spacing */
+}
+
 a {
 	color: rgb(67, 67, 255);
 }

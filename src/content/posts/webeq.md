@@ -1,10 +1,13 @@
 ---
 title: 'WebEQ'
-description: 'Multi-band audio equalizer for the web made in React'
+description: 'Multi-band audio equalizer for the web made in React.'
 createdAt: 'Sep 07 2023'
 image: '/webeq.png'
 priority: 6
 ---
+## Links
+#### Website: [https://webeq.netlify.app/](https://webeq.netlify.app/)
+#### GitHub: [https://github.com/theobourgeois/WebEq](https://github.com/theobourgeois/WebEq)
 
 ## What is EQ?
 
