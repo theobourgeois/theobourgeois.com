@@ -21,12 +21,12 @@ const posts = (await getCollection('posts')).sort(
 		<Header />
 		<main class="mx-auto mt-2 w-3/4">
 			<p class="mb-4 text-lg">
-				Hi, I'm <strong>Théo Bourgeois</strong>, a software engineer and web developer. This website is used to show my projects and other things I'm working on.
+				Hi, I'm <strong class="text-blue-700">Théo Bourgeois</strong>, a software engineer and web developer. This website is used to show my projects and other things I'm working on.
 			</p>
 
 			<div class="space-y-4">
 				<div class="space-y-2">
-				<p class="font-semibold text-3xl">My Posts</p>
+				<p class="font-semibold text-3xl ">My Posts</p>
 					<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
 						{
 							posts.map((post) => (

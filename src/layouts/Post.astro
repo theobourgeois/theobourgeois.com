@@ -23,16 +23,7 @@ const { title, description, createdAt, image } = Astro.props
 					<p class="text-4xl font-semibold">{title}</p>
 					<p>{description}</p>
 				</div>
-				<p>
-					<strong>Created:</strong>
-					{
-						createdAt.toLocaleDateString('en-us', {
-							year: 'numeric',
-							month: 'short',
-							day: 'numeric'
-						})
-					}
-				</p>
+			
 				<Image
 					src={image}
 					class="aspect-video w-full drop-shadow-md mb-8"
