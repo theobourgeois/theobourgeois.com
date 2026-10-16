@@ -3,6 +3,7 @@ import "@fontsource-variable/jetbrains-mono";
 import "./style.css";
 import { clearCache, layoutWithLines, prepareWithSegments, type PreparedTextWithSegments } from "@chenglou/pretext";
 import { Graph, type CellLook, type Day } from "./graph";
+import { Reveal } from "./reveal";
 import { FAMILY, MONO, baseline, font, glyph, glyphRun, type GlyphRun } from "./text";
 import { GIT, HIDE, IN, OUT, PROJECT, SWAP, bump, clamp, clamp01, easeInOutQuart, easeOutCubic, flicker, lerp, rand, span } from "./timeline";
 import { Trails, type TrailParams } from "./trails";
@@ -52,6 +53,7 @@ const crumbName = $(".crumb-name");
 const crumbStars = $(".crumb-stars");
 const crumbGh = $<HTMLAnchorElement>(".crumb-gh");
 const readme = $(".readme");
+const reveal = new Reveal(projectView, () => kick());
 
 type Fx = Omit<TrailParams, "center">;
 // The title's move: an echo blooming out of where it left. The content: an echo that mostly stays put, splitting.
@@ -61,6 +63,8 @@ const SETTLE_FX: Fx = { zoom: 1.04, sep: 0.08, trail: 0.45, swirl: 0, warp: 0.25
 const OUT_FX: Fx = { zoom: 0.82, sep: 0.05, trail: 0.5, swirl: -0.35, warp: 0.3 };
 // A hover glows out of the thing itself, a little, splitting as it goes.
 const HOVER_FX: Fx = { zoom: 1.12, sep: 0.09, trail: 0.32, swirl: 0, warp: 0.15 };
+// A README block coming in: barely zooming, so its light hangs where it lands and splits.
+const REVEAL_FX: Fx = { zoom: 1.05, sep: 0.1, trail: 0.4, swirl: 0, warp: 0.2 };
 
 const ROW_LINE = 20;
 /** Samples per frame in the title's streak of light. */
@@ -344,7 +348,7 @@ function gitHide(t: number, emit: CanvasRenderingContext2D | null) {
 
 let readmeState: "loading" | "ready" | "none" = "loading";
 
-/** A project's page: the crumb comes in on a split, then the README rises into place. */
+/** A project's page: the crumb comes in on a split, then the README's blocks start revealing (see Reveal). */
 function projectShow(t: number, emit: CanvasRenderingContext2D | null) {
   if (t < 0) return hidePanel(projectView);
   projectView.style.visibility = "visible";
@@ -354,15 +358,9 @@ function projectShow(t: number, emit: CanvasRenderingContext2D | null) {
   const ce = easeOutCubic(c);
   crumb.style.opacity = String(ce);
   crumb.style.textShadow = rgbSplit((1 - ce) * 4);
-  const b = span(t, PROJECT.body.start, PROJECT.body.dur);
-  const be = easeOutCubic(b);
-  readme.style.opacity = readmeState === "loading" ? "0" : String(be);
-  readme.style.transform = `translateY(${(1 - be) * 14}px)`;
-  if (emit) {
-    if (c > 0 && c < 1) emitText(emit, crumbName, bump(c) * 0.7);
-    const h1 = readme.querySelector("h1");
-    if (h1 && readmeState === "ready" && b > 0 && b < 1) emitText(emit, h1, bump(b) * 0.5);
-  }
+  readme.style.opacity = readmeState === "loading" ? "0" : "1";
+  if (t >= PROJECT.body.start) reveal.arm();
+  if (emit && c > 0 && c < 1) emitText(emit, crumbName, bump(c) * 0.7);
 }
 
 function projectHide(t: number, emit: CanvasRenderingContext2D | null) {
@@ -528,12 +526,18 @@ function frame(ms: number) {
     if (drew) emitted = true;
   }
 
+  const shown = reveal.step(now, emit, trails?.scale ?? 1);
+  if (shown.center) {
+    emitted = true;
+    if (!dir) fx = { ...REVEAL_FX, center: shown.center };
+  }
+
   if (trails) {
     if (emitted) aliveUntil = now + fx.trail * 4 + 0.3;
     if (now < aliveUntil) trails.step(dt, now, fx, emitted);
     else trails.clear();
   }
-  if (dir || dirty || now < aliveUntil || bursts.length) raf = requestAnimationFrame(frame);
+  if (dir || dirty || shown.busy || now < aliveUntil || bursts.length) raf = requestAnimationFrame(frame);
 }
 
 function kick() {
@@ -604,6 +608,7 @@ function fillCrumb() {
 function openProject(name: string) {
   projectName = name;
   readmeState = "loading";
+  reveal.clear();
   readme.replaceChildren();
   projectView.scrollTop = 0;
   fillCrumb();
@@ -629,19 +634,24 @@ function fillReadme(name: string, html: string) {
   const relative = (u: string) => !/^([a-z]+:|\/\/|#|data:)/i.test(u);
   const clean = (u: string) => u.replace(/^\.?\//, "");
   const raw = (u: string) => `https://raw.githubusercontent.com/${path}/${branch}/${clean(u)}`;
-  readme.innerHTML = html;
-  readme.querySelectorAll(".anchor").forEach((a) => a.remove());
-  readme.querySelectorAll("img").forEach((img) => {
+  // Rewritten in a detached document, so nothing loads from the wrong place before it's fixed.
+  const doc = new DOMParser().parseFromString(html, "text/html").body;
+  doc.querySelectorAll(".anchor").forEach((a) => a.remove());
+  doc.querySelectorAll("img").forEach((img) => {
     const src = img.getAttribute("src") ?? "";
-    if (relative(src)) img.src = raw(src);
-    img.loading = "lazy";
-    img.decoding = "async";
+    if (relative(src)) {
+      img.setAttribute("src", raw(src));
+      // The repo's own images allow it, so the trails may draw them.
+      img.setAttribute("crossorigin", "anonymous");
+    }
+    img.setAttribute("loading", "lazy");
+    img.setAttribute("decoding", "async");
   });
-  readme.querySelectorAll<HTMLSourceElement>("source[srcset]").forEach((source) => {
+  doc.querySelectorAll("source[srcset]").forEach((source) => {
     const srcset = source.getAttribute("srcset")!;
-    if (relative(srcset)) source.srcset = raw(srcset);
+    if (relative(srcset)) source.setAttribute("srcset", raw(srcset));
   });
-  readme.querySelectorAll("a[href]").forEach((a) => {
+  doc.querySelectorAll("a[href]").forEach((a) => {
     const href = a.getAttribute("href")!;
     if (href.startsWith("#")) return;
     if (relative(href)) {
@@ -651,6 +661,8 @@ function fillReadme(name: string, html: string) {
     a.setAttribute("target", "_blank");
     a.setAttribute("rel", "noopener");
   });
+  readme.replaceChildren(...Array.from(doc.childNodes).map((n) => document.adoptNode(n)));
+  reveal.set(readme.querySelector("article") ?? readme, reduceMotion);
 }
 
 // A README's own #links scroll within it (GitHub prefixes its heading ids), not through the site's routes.
