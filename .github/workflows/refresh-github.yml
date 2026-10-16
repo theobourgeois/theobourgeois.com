@@ -1,10 +1,10 @@
-# Once a week: pull the contribution graph, pinned repos and their READMEs, and push them if anything changed.
+# Once a day: pull the contribution graph, pinned repos and their READMEs, and push them if anything changed.
 # The push is what redeploys the site on Vercel.
 name: Refresh GitHub data
 
 on:
   schedule:
-    - cron: "0 12 * * 1" # Mondays, 12:00 UTC
+    - cron: "0 8 * * *" # every day, 08:00 UTC (early morning in Halifax)
   workflow_dispatch:
 
 permissions:

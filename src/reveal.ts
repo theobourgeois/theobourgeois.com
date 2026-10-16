@@ -12,7 +12,6 @@ interface Unit {
   kind: Kind;
   /** When it starts (seconds, the frame clock's), or never yet. */
   at: number;
-  seen: boolean;
   q: number;
   prepared: PreparedTextWithSegments | null;
   font: string;
@@ -21,9 +20,11 @@ interface Unit {
 const DUR: Record<Kind, number> = { text: 0.5, image: 0.8, block: 0.5 };
 const STAGGER = 0.07;
 
+/** Every picture in it has loaded (or failed: then there's nothing to wait for). */
+const loaded = (el: HTMLElement) => Array.from(el.querySelectorAll("img")).every((img) => img.complete);
+
 export class Reveal {
   private units: Unit[] = [];
-  private io: IntersectionObserver | null = null;
   private armed = false;
   /** The soonest the next block may start, so blocks arriving together still go one after another. */
   private next = 0;
@@ -31,7 +32,11 @@ export class Reveal {
   constructor(
     private root: HTMLElement,
     private wake: () => void,
-  ) {}
+  ) {
+    // Where a block is, checked as the page scrolls (an observer would count a still-loading picture, no taller
+    // than nothing, as on screen).
+    root.addEventListener("scroll", () => wake(), { passive: true });
+  }
 
   /** A README's blocks, hidden until each is revealed (or all shown at once). */
   set(article: Element, instant: boolean) {
@@ -42,24 +47,8 @@ export class Reveal {
       else if (child.matches("pre, table, hr, .highlight, .snippet-clipboard-content, markdown-accessiblity-table")) this.add(child, "block");
       else this.add(child, "text");
     }
-    if (instant) {
-      this.units.forEach((u) => this.apply(u, 1));
-      return;
-    }
-    this.io = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          const unit = this.units.find((u) => u.el === entry.target);
-          if (unit && entry.isIntersecting) unit.seen = true;
-        }
-        this.wake();
-      },
-      { root: this.root, threshold: 0.1 },
-    );
-    this.units.forEach((u) => {
-      this.apply(u, 0);
-      this.io!.observe(u.el);
-    });
+    this.units.forEach((u) => this.apply(u, instant ? 1 : 0));
+    this.wake();
   }
 
   /** The page is showing: what's in view can start. */
@@ -70,8 +59,6 @@ export class Reveal {
   }
 
   clear() {
-    this.io?.disconnect();
-    this.io = null;
     this.units = [];
     this.armed = false;
     this.next = 0;
@@ -81,10 +68,14 @@ export class Reveal {
   step(now: number, emit: CanvasRenderingContext2D | null, scale: number) {
     let busy = false;
     let center: [number, number] | null = null;
+    const view = this.root.getBoundingClientRect();
     for (const u of this.units) {
       if (u.q >= 1) continue;
       if (u.at === Infinity) {
-        if (!this.armed || !u.seen) continue;
+        // A picture waits until it's here, or its wipe would show an empty box.
+        if (!this.armed || !loaded(u.el)) continue;
+        const r = u.el.getBoundingClientRect();
+        if (r.top > view.bottom - 40 || r.bottom < view.top) continue;
         u.at = Math.max(now, this.next);
         this.next = u.at + STAGGER;
       }
@@ -100,7 +91,12 @@ export class Reveal {
   }
 
   private add(el: HTMLElement, kind: Kind) {
-    this.units.push({ el, kind, at: Infinity, seen: false, q: -1, prepared: null, font: "" });
+    this.units.push({ el, kind, at: Infinity, q: -1, prepared: null, font: "" });
+    if (kind === "image")
+      el.querySelectorAll("img").forEach((img) => {
+        img.addEventListener("load", this.wake, { once: true });
+        img.addEventListener("error", this.wake, { once: true });
+      });
   }
 
   private apply(u: Unit, q: number) {
@@ -109,8 +105,10 @@ export class Reveal {
     const e = easeOutCubic(q);
     const s = u.el.style;
     if (u.kind === "image") {
+      // The wipe clips the pictures, never the block: a clipped block never counts as on screen, so never starts.
       s.opacity = String(Math.min(1, q * 3));
-      s.clipPath = q >= 1 ? "" : `inset(0 ${(1 - e) * 100}% 0 0)`;
+      const clip = q >= 1 ? "" : `inset(0 ${(1 - e) * 100}% 0 0)`;
+      u.el.querySelectorAll("img").forEach((img) => (img.style.clipPath = clip));
       return;
     }
     const d = (1 - e) * 4;

@@ -644,7 +644,7 @@ function fillReadme(name: string, html: string) {
       // The repo's own images allow it, so the trails may draw them.
       img.setAttribute("crossorigin", "anonymous");
     }
-    img.setAttribute("loading", "lazy");
+    // Not lazy: a lazy image the reveal has clipped away is never loaded, and it reveals nothing.
     img.setAttribute("decoding", "async");
   });
   doc.querySelectorAll("source[srcset]").forEach((source) => {
