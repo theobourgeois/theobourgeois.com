@@ -41,10 +41,11 @@ export class Graph {
     return this.weeks.slice(-this.cols);
   }
 
+  /** The whole year, at a smaller cell where it won't fit; the page scrolls it sideways, latest week in view. */
   layout(maxWidth: number) {
     const fits = (cell: number, gap: number) => Math.floor((maxWidth + gap) / (cell + gap));
     this.cell = fits(13, 3) >= this.weeks.length ? 13 : 11;
-    this.cols = Math.min(this.weeks.length, fits(this.cell, this.gap));
+    this.cols = this.weeks.length;
     const step = this.cell + this.gap;
     const w = Math.max(1, this.cols * step - this.gap);
     const h = 7 * step - this.gap;

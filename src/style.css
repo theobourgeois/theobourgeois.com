@@ -161,6 +161,7 @@ body {
   bottom: 0;
   z-index: 3;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   justify-items: center;
   align-content: safe center;
   overflow-y: auto;
@@ -181,6 +182,25 @@ body {
   margin-bottom: 16px;
   font: 400 12px/1 "JetBrains Mono Variable", monospace;
   color: rgb(255 255 255 / 0.45);
+}
+
+/* Where the year doesn't fit (phones) it scrolls sideways, starting at the latest week. The padding leaves the
+   tooltip room above the top row; the left edge fades to say there's more. */
+.graph-scroll {
+  margin-top: -36px;
+  padding-top: 36px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.graph-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .graph-scroll {
+    mask-image: linear-gradient(to right, transparent, #000 28px);
+  }
 }
 
 .graph-wrap {

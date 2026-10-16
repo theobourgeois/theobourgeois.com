@@ -44,6 +44,7 @@ const gitView = $(".git-view");
 const total = $(".git-total");
 const list = $(".projects");
 const graph = new Graph($<HTMLCanvasElement>(".graph"), $(".tip"));
+const graphScroll = $(".graph-scroll");
 const projectView = $(".project-view");
 const crumb = $(".crumb");
 const crumbGit = $<HTMLAnchorElement>(".crumb-git");
@@ -133,6 +134,7 @@ function layout() {
   crisp.height = Math.round(vh * dpr);
   trails?.resize(vw, vh, devicePixelRatio || 1);
   graph.layout(Math.min(vw - 48, 845));
+  graphScroll.scrollLeft = graphScroll.scrollWidth;
 
   // The rows' text size is the CSS's (smaller on phones): prepare their descriptions in it.
   rows.forEach((row) => {
