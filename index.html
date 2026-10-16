@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>theobourgeois.com</title>
+    <meta name="description" content="building cool shit" />
+    <meta name="theme-color" content="#000" />
+    <link rel="icon" href="data:," />
+  </head>
+  <body>
+    <div class="bg" aria-hidden="true">
+      <video muted loop playsinline autoplay preload="auto" disablepictureinpicture disableremoteplayback>
+        <source src="/media/bg-portrait.hevc.mp4" type='video/mp4; codecs="hvc1.1.6.L123.B0"' media="(orientation: portrait)" />
+        <source src="/media/bg-portrait.h264.mp4" type='video/mp4; codecs="avc1.64002A"' media="(orientation: portrait)" />
+        <source src="/media/bg-landscape.hevc.mp4" type='video/mp4; codecs="hvc1.1.6.L150.B0"' />
+        <source src="/media/bg-landscape.h264.mp4" type='video/mp4; codecs="avc1.640032"' />
+      </video>
+    </div>
+    <div class="dim" aria-hidden="true"></div>
+    <div class="veil" aria-hidden="true"></div>
+    <canvas id="trails" class="fx" aria-hidden="true"></canvas>
+
+    <!-- The title and subtitle are drawn on #crisp so their letters can fly; these are for everyone else. -->
+    <h1 class="sr-only">theobourgeois.com</h1>
+    <p class="sr-only">building cool shit</p>
+
+    <nav class="nav">
+      <button id="go-git" type="button" aria-label="git"><span class="br">[</span> git <span class="br">]</span></button>
+    </nav>
+
+    <section class="git-view" aria-label="GitHub">
+      <div class="git-inner">
+        <p class="git-total"></p>
+        <div class="graph-wrap">
+          <canvas class="graph" role="img" aria-label="Contribution graph"></canvas>
+          <div class="tip" role="status"></div>
+        </div>
+        <ol class="projects"></ol>
+      </div>
+    </section>
+
+    <section class="project-view" aria-label="Project">
+      <div class="project-inner">
+        <nav class="crumb">
+          <a class="crumb-git" href="#git">git</a>
+          <span class="crumb-sep">/</span>
+          <span class="crumb-name"></span>
+          <span class="crumb-fill"></span>
+          <span class="crumb-stars"></span>
+          <a class="crumb-gh" target="_blank" rel="noopener">github ↗</a>
+        </nav>
+        <article class="readme"></article>
+      </div>
+    </section>
+
+    <canvas id="crisp" class="fx" aria-hidden="true"></canvas>
+    <button id="go-home" type="button" aria-label="Home"></button>
+
+    <script>
+      const video = document.querySelector(".bg video");
+      const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const saveData = navigator.connection?.saveData;
+
+      if (reduceMotion || saveData) {
+        // Poster only: stop the download before it starts.
+        video.removeAttribute("autoplay");
+        video.querySelectorAll("source").forEach((s) => s.remove());
+        video.load();
+      } else {
+        video.addEventListener("playing", () => video.classList.add("playing"), { once: true });
+        // Don't decode frames nobody can see.
+        document.addEventListener("visibilitychange", () => {
+          if (document.hidden) video.pause();
+          else video.play().catch(() => {});
+        });
+      }
+    </script>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
